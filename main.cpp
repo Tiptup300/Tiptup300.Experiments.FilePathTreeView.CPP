@@ -16,30 +16,8 @@ void writeFileNames(vector<FileModel> fileModels)
 {
     for (auto it = fileModels.begin(); it != fileModels.end(); ++it)
     {
-        cout << (it)->m_filename << endl;
-    }
-}
-
-int main()
-{
-    rootDirectoryPath = "/home/tiptup300/repos/release-art-back";
-
-    cout << "starting from path\n"
-         << rootDirectoryPath << "\n";
-
-    const vector<FileModel> fileModels = generateModels(rootDirectoryPath);
-    sortFileModels(&fileModels);
-
-    writeFileNames(fileModels);
-
-    for (auto it = fs::directory_iterator(rootDirectoryPath); it != fs::directory_iterator(); ++it)
-    {
-
-        const fs::path &filePath = it->path();
-        const string filename = filePath.filename();
-        const fs::file_status &fileStatus = it->symlink_status();
-
-        if (fs::is_directory(fileStatus))
+        string &filename = it->m_filename;
+        if (it->m_isDirectory)
         {
             cout << " + " << filename << "/..." << endl;
         }
@@ -48,7 +26,18 @@ int main()
             cout << " - " << filename << endl;
         }
     }
-    return 0;
+}
+
+int main()
+{
+    rootDirectoryPath = "/home/tiptup300/repos/release-art-back";
+
+    cout << "starting from path:" << rootDirectoryPath << "\n";
+
+    const vector<FileModel> fileModels = generateModels(rootDirectoryPath);
+    sortFileModels(&fileModels);
+
+    writeFileNames(fileModels);
 }
 
 vector<FileModel> generateModels(const string &rootDirectoryPath)
@@ -63,7 +52,7 @@ vector<FileModel> generateModels(const string &rootDirectoryPath)
         {
             FileModel fileModel;
             fileModel.m_filename = filePath.filename();
-            fileModel.m_fullPath = filePath.root_path();
+            fileModel.m_fullPath = filePath.native();
             fileModel.m_isDirectory = true;
             fileModel.m_directoryFiles = generateModels(filePath.native());
 
